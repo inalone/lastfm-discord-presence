@@ -1,33 +1,19 @@
-use lastfm_rs::user::recent_tracks::{Album, Artist, Track};
 mod discord;
-use discord_sdk::activity::{ActivityBuilder, Assets};
+
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
-use std::time::SystemTime;
 use tokio::time::sleep;
 
 const USER: &'static str = "mjghd";
 
-async fn update_discord_presence(discord_client: &discord::Client, track: &Track) {
-    let rp = ActivityBuilder::default()
-        .details(&track.name)
-        .state(&track.artist.name)
-        .assets(Assets {
-            large_image: Some(track.images[0].image_url.to_string()),
-            large_text: Some(track.album.name.to_string()),
-            small_image: None,
-            small_text: None,
-        })
-        .start_timestamp(SystemTime::now());
+async fn reset_activity(discord_client: &discord::Client, last_track_url: &mut String) {
+    if last_track_url.is_empty() {
+        return;
+    }
 
-    match discord_client.discord.update_activity(rp).await {
-        Ok(_) => println!(
-            "Updated Discord activity, now playing: {} by {}",
-            track.name, track.artist.name
-        ),
-        Err(_) => println!("Unable to update Discord activity - is Discord running?"),
-    };
+    discord::clear_activity(discord_client).await;
+    *last_track_url = String::new();
 }
 
 async fn check_now_playing(discord_client: &discord::Client, last_track_url: &mut String) {
@@ -45,21 +31,24 @@ async fn check_now_playing(discord_client: &discord::Client, last_track_url: &mu
 
         if let Some(attributes) = &current_track.attrs {
             if attributes.now_playing != "true" {
+                reset_activity(discord_client, last_track_url).await;
                 return;
             }
 
-            update_discord_presence(discord_client, current_track).await;
+            discord::update_presence(discord_client, current_track).await;
             *last_track_url = current_track.url.to_string();
+        } else {
+            reset_activity(discord_client, last_track_url).await;
         }
     }
 }
 
 #[tokio::main]
 async fn main() {
+    let client = discord::make_client(discord_sdk::Subscriptions::ACTIVITY).await;
+
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
-
-    let client = discord::make_client(discord_sdk::Subscriptions::ACTIVITY).await;
 
     ctrlc::set_handler(move || {
         r.store(false, Ordering::SeqCst);
@@ -69,14 +58,9 @@ async fn main() {
     let mut last_track_url = String::new();
     while running.load(Ordering::SeqCst) {
         sleep(Duration::from_millis(3000)).await;
-        println!("100 ms have elapsed");
         check_now_playing(&client, &mut last_track_url).await;
     }
 
-    client
-        .discord
-        .clear_activity()
-        .await
-        .expect("Unable to clear Discord activity");
+    discord::clear_activity(&client).await;
     client.discord.disconnect().await;
 }
