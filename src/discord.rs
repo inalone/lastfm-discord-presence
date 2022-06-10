@@ -2,9 +2,7 @@ use discord_sdk as ds;
 use lastfm_rs::user::recent_tracks::Track;
 use std::time::SystemTime;
 
-/// Application identifier for "Andy's Test App" used in the Discord SDK's
-/// examples.
-pub const APP_ID: ds::AppId = 310270644849737729;
+pub const APP_ID: ds::AppId = 948727383475765309;
 
 pub struct Client {
     pub discord: ds::Discord,
