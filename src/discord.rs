@@ -48,7 +48,7 @@ pub async fn update_presence(discord_client: &Client, track: &Track) {
         .details(&track.name)
         .state(&track.artist.name)
         .assets(ds::activity::Assets {
-            large_image: Some(track.images[0].image_url.to_string()),
+            large_image: Some(track.images[3].image_url.to_string()),
             large_text: Some(track.album.name.to_string()),
             small_image: None,
             small_text: None,
