@@ -21,10 +21,13 @@ async fn update_discord_presence(discord_client: &discord::Client, track: &Track
         })
         .start_timestamp(SystemTime::now());
 
-    println!(
-        "updated activity: {:?}",
-        discord_client.discord.update_activity(rp).await
-    );
+    match discord_client.discord.update_activity(rp).await {
+        Ok(_) => println!(
+            "Updated Discord activity, now playing: {} by {}",
+            track.name, track.artist.name
+        ),
+        Err(_) => println!("Unable to update Discord activity - is Discord running?"),
+    };
 }
 
 async fn check_now_playing(discord_client: &discord::Client, last_track_url: &mut String) {
@@ -70,9 +73,10 @@ async fn main() {
         check_now_playing(&client, &mut last_track_url).await;
     }
 
-    println!(
-        "cleared activity: {:?}",
-        client.discord.clear_activity().await
-    );
+    client
+        .discord
+        .clear_activity()
+        .await
+        .expect("Unable to clear Discord activity");
     client.discord.disconnect().await;
 }
