@@ -1,5 +1,3 @@
-// use lastfm_rs;
-
 const USER: &'static str = "mjghd";
 
 async fn check_now_playing() {
