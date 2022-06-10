@@ -12,14 +12,10 @@ async fn update_discord_presence(discord_client: &discord::Client, track: &Track
         .assets(Assets {
             large_image: Some(track.images[0].image_url.as_str().to_string()),
             large_text: Some(track.album.name.as_str().to_string()),
-            small_image: Some(track.images[0].image_url.as_str().to_string()),
-            small_text: Some(track.album.name.as_str().to_string()),
+            small_image: None,
+            small_text: None,
         })
         .start_timestamp(SystemTime::now());
-
-    //            Assets::default()
-    // .large("the".to_owned(), Some("u mage".to_owned()))
-    // .small("the".to_owned(), Some("i mage".to_owned())),
 
     println!(
         "updated activity: {:?}",
