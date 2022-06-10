@@ -13,7 +13,7 @@ pub struct Client {
 pub async fn clear_activity(discord_client: &Client) {
     match discord_client.discord.clear_activity().await {
         Ok(_) => println!("Cleared Discord activity"),
-        Err(_) => println!(),
+        Err(_) => println!("Unable to clear Discord activity"),
     }
 }
 
