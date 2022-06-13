@@ -5,9 +5,8 @@ A simple, configuration-free way to display your now playing last.fm track as Di
 ## Running the program
 
 Simply cd to the directory and run
-`cargo run --release`
+`cargo run --release username` (replacing `username` with your last.fm username)
 
 ## Known caveats
 
-- I haven't decided how to handle usernames the best way yet, so to display your user, change the `const USER` in main.rs to your username.
 - I haven't implemented repeated retries to connect to the Discord client yet, so in order to run this, Discord must first already be open.
