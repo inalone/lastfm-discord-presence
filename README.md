@@ -10,3 +10,4 @@ Simply cd to the directory and run
 ## Known caveats
 
 - I haven't implemented repeated retries to connect to the Discord client yet, so in order to run this, Discord must first already be open.
+- There is a bug where nowplaying seems to not be stripped after playing songs sometimes. I am working on debugging this behaviour.
