@@ -28,13 +28,13 @@ async fn check_now_playing(
         }
 
         let current_track = &tracks.tracks[0];
-        if current_track.url == last_track_url.as_str() {
-            return;
-        }
-
         if let Some(attributes) = &current_track.attrs {
             if attributes.now_playing != "true" {
                 reset_activity(discord_client, last_track_url).await;
+                return;
+            }
+
+            if current_track.url == last_track_url.as_str() {
                 return;
             }
 
