@@ -1,10 +1,35 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG # Run only when tag created
+
+cache:
+  paths:
+    - target/release/build
+    - target/release/deps
+
 stages:
   - build
+  - release
 
-rust-latest:
+build:
   stage: build
   image: rust:latest
-  rules:
-    - if: $CI_COMMIT_TAG # Run this job when a tag is created
+
   script:
     - cargo build --release --verbose
+  artifacts:
+    - target/release/lastfm-discord-presence
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: build
+      artifacts: true
+  release:
+    name: 'Release for $CI_COMMIT_TAG'
+    tag_name: '$CI_COMMIT_SHORT_SHA'
+    assets:
+      links:
+        - name: 'Linux executable'
+          url: 'https://gitlab.com/inalone/lastfm-discord-presence/cw/-/jobs/${GE_JOB_ID}/artifacts/file/target/release/lastfm-discord-presence'
