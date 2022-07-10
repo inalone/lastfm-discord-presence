@@ -9,7 +9,7 @@ cache:
 
 stages:
   - build
-  - release_job
+  - release
 
 build:
   stage: build
@@ -21,7 +21,7 @@ build:
     paths:
       - target/release/lastfm-discord-presence
 
-release_job:
+release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   needs:
